@@ -1,0 +1,140 @@
+This is a Tcl extension to execute JavaScript using the SpiderMonkey Javascript
+interpreter from Tcl.
+
+This package is a freely available open source package.  You can do
+virtually anything you like with it, such as modifying it, redistributing
+it, and selling it either in whole or in part.  See the file
+"license.terms" for complete information.
+
+CONTENTS
+========
+The following is a short description of the files you will find in
+the sample extension.
+
+Makefile.in	Makefile template.  The configure script uses this file to
+		produce the final Makefile.
+
+README		This file
+
+aclocal.m4	Generated file.  Do not edit.  Autoconf uses this as input
+		when generating the final configure script.  See "tcl.m4"
+		below.
+
+configure	Generated file.  Do not edit.  This must be regenerated
+		anytime configure.in or tclconfig/tcl.m4 changes.
+
+configure.in	Configure script template.  Autoconf uses this file as input
+		to produce the final configure script.
+
+pkgIndex.tcl.in Package index template.  The configure script will use
+		this file as input to create pkgIndex.tcl.
+
+tcljs.c	        Implementation of new Tcl command "js::interp"
+
+tclconfig/	This directory contains various template files that build
+		the configure script.  They should not need modification.
+
+	install-sh	Program used for copying binaries and script files
+			to their install locations.
+
+	tcl.m4		Collection of Tcl autoconf macros.  Included by
+			aclocal.m4 to define SC_* macros.
+
+SPIDERMONKEY
+============
+
+This extension depends on the SpiderMonkey JavaScript interpreter. You can get
+it from here:
+
+    http://www.mozilla.org/js/spidermonkey/
+
+Build SpiderMonkey before building the TclJs extension.
+
+UNIX BUILD
+==========
+
+Building under most UNIX systems is easy, just run the configure script and
+then run make. You will need to specify 3 configure parameters:
+
+    --with-spidermonkey=<DIR>
+
+        The directory in which SpiderMonkey is extracted and built. When you
+        extracted the SpiderMonkey archive in /tmp, the directory is /tmp/js
+
+    --with-spidermonkey-build-type=<BUILD-TYPE>
+
+        The SpiderMonkey build type. To find this type, go to the src sub
+        directory in the directory in which you extracted SpiderMonkey (this is
+        also the directory in which you built SpiderMonkey). In the example
+        given above this would be directory /tmp/js/src. A new sub-directory
+        was added to this directory, the name of this directory is the required
+        build type. On Linux this looks like: 
+
+            Linux_All_DBG.OBJ
+
+    --with-spidermonkey-flags=<FLAGS>
+
+        When building SpiderMonkey, some -D flags are used to selec the
+        appropriate parts of header file. These need to be specified with this
+        configure parameter. On Linux, the following flags was required:
+
+            -DXP_UNIX
+
+The following minimal example will install the extension in the
+/opt/tcl directory when SpiderMonkey was build in /tmp/js for Linux:
+
+	$ cd sampleextension
+	$ ./configure --prefix=/opt/tcl \
+	    --with-spidermonkey=/tmp/js \
+	    --with-spidermonkey-build-type=Linux_All_DBG.OBJ \
+	    --with-spidermonkey-flags=-DXP_UNIX
+	$ make
+	$ make install
+
+And on windows:
+
+
+
+WINDOWS BUILD
+=============
+
+Building on Windows was only tested using Makefile.vc and VC9. Alternative using
+cygwin and/or msys were not tested.
+
+To build Spidermonkey on Windows this command was used:
+
+ > nmake -f js.mak CFG="js - Win32 Release"
+
+You will need to use 'mt.exe' to add the manifest file to the generated dll. Run
+this command in the 'Release' directory:
+
+ > mt -manifest js32.dll.manifest -outputresource:js32.dll;2
+
+Building the extension with the following commands (int the win directory):
+
+ > nmake -f makefile.vc TCLDIR=c:\Tcl SPIDERMONKEYDIR=c:\tmp\js \
+       SPIDERMONKEYTYPE=Release SPIDERMONKEYFLAGS=/DXP_WIN clean
+ > nmake -f makefile.vc TCLDIR=c:\Tcl SPIDERMONKEYDIR=c:\tmp\js \
+       SPIDERMONKEYTYPE=Release SPIDERMONKEYFLAGS=/DXP_WIN
+
+After install, copy the js32.dll and required MSRT* files into the lib directory
+where TclJs01.dll is located.
+
+INSTALLATION
+============
+
+The installation of a TEA package is structure like so:
+
+         $exec_prefix
+          /       \
+        lib       bin
+         |         |
+   PACKAGEx.y   (dependent .dll files on Windows)
+         |
+  pkgIndex.tcl (.so|.dll files)
+
+The main .so|.dll library file gets installed in the versioned PACKAGE
+directory, which is OK on all platforms because it will be directly
+referenced with by 'load' in the pkgIndex.tcl file.  Dependent DLL files on
+Windows must go in the bin directory (or other directory on the user's
+PATH) in order for them to be found.

@@ -1,0 +1,358 @@
+# Commands covered:  js::interp , $ip (uc)eval, $ip destroy, $ip function
+#
+# This file contains a collection of tests for one or more of the Tcl
+# built-in commands.  Sourcing this file into Tcl runs the tests and
+# generates output for errors.  No output means no errors were found.
+#
+# Copyright (c) 2007 Jos Decoster
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import ::tcltest::*
+}
+
+package require TclJs
+
+# 1. js::interp tests
+
+test tcljs-1.1 {create Js-interp} -setup {
+} -body {
+    set jsip [js::interp]
+} -cleanup {
+    $jsip destroy
+} -returnCodes {ok return} -match glob -result {::js::jsip*}
+
+test tcljs-1.2 {create Js-interp with arguments} -setup {
+} -body {
+    set jsip [js::interp qwerty]
+} -cleanup {
+} -returnCodes {error} -result {wrong # args: should be "js::interp "}
+
+# 2. <jsip> tests
+
+test tcljs-2.1 {no method} -setup {
+    set jsip [js::interp]
+} -body {
+    $jsip
+} -cleanup {
+    $jsip destroy
+} -returnCodes {error} -match glob -result {wrong # args: should be "::js::jsip* subcommand ..."}
+
+test tcljs-2.2 {invalid method} -setup {
+    set jsip [js::interp]
+} -body {
+    $jsip azerty
+} -cleanup {
+    $jsip destroy
+} -returnCodes {error} -match glob -result {bad subcommand "azerty": must be eval, uceval, destroy, function, or callback}
+
+# 3. <jsip> eval tests
+
+test tcljs-3.1 {eval script in Js-interp} -setup {
+    set jsip [js::interp]
+} -body {
+    $jsip eval {a = 10 * 20;}
+} -cleanup {
+    $jsip destroy
+} -returnCodes {ok return} -result {200}
+
+test tcljs-3.2 {invalid arguments} -setup {
+    set jsip [js::interp]
+} -body {
+    $jsip eval a = 10 * 20;
+} -cleanup {
+    $jsip destroy
+} -returnCodes {error} -match glob -result {wrong # args: should be "::js::jsip* eval script"}
+
+test tcljs-3.3 {error in Js} -setup {
+    set jsip [js::interp]
+} -body {
+    $jsip eval {a = 10 +-* 20};
+} -cleanup {
+    $jsip destroy
+} -returnCodes {error} -match glob -result {Error during evaluation: SyntaxError: missing ; before statement}
+
+# 4. <jsip> uceval tests
+
+test tcljs-4.1 {uceval script in Js-interp} -setup {
+    set jsip [js::interp]
+} -body {
+    $jsip uceval {a = 10 * 20;}
+} -cleanup {
+    $jsip destroy
+} -returnCodes {ok return} -result {200}
+
+test tcljs-4.2 {uceval script in Js-interp} -setup {
+    set jsip [js::interp]
+} -body {
+    $jsip uceval a = 10 * 20;
+} -cleanup {
+    $jsip destroy
+} -returnCodes {error} -match glob -result {wrong # args: should be "::js::jsip* uceval script"}
+
+test tcljs-4.3 {error in Js} -setup {
+    set jsip [js::interp]
+} -body {
+    $jsip uceval {a = 10 +-* 20};
+} -cleanup {
+    $jsip destroy
+} -returnCodes {error} -match glob -result {Error during evaluation: SyntaxError: missing ; before statement}
+
+# 5. <jsip> destroy tests
+
+test tcljs-5.1 {destroy Js-interp} -setup {
+    set jsip [js::interp]
+} -body {
+    $jsip destroy
+} -cleanup {
+} -returnCodes {ok return} -result {}
+
+test tcljs-5.2 {destroy Js-interp with arguments} -setup {
+    set jsip [js::interp]
+} -body {
+    $jsip destroy qwerty
+} -cleanup {
+} -returnCodes {error} -match glob -result {wrong # args: should be "::js::jsip* destroy "}
+
+# 6. <jsip> function tests
+
+test tcljs-6.1 {call tcl command from Js-interp} -setup {
+    set jsip [js::interp]
+} -body {
+    $jsip function set 2 string tcl_set
+    $jsip eval {tcl_set("qwerty", "azerty");}
+    set qwerty
+} -cleanup {
+    $jsip destroy
+} -returnCodes {ok return} -result {azerty}
+
+test tcljs-6.2 {call tcl function from Js-interp} -setup {
+    proc tcl_says_hi_from_js { a } {
+	return "Hi $a!"
+    }
+    set jsip [js::interp]
+} -body {
+    $jsip function tcl_says_hi_from_js 1 string tcl_says_hi
+    $jsip eval {tcl_says_hi("World");}
+} -cleanup {
+    $jsip destroy
+    rename tcl_says_hi_from_js {}
+} -returnCodes {ok return} -result {Hi World!}
+
+test tcljs-6.3 {call tcl function from Js-interp, default function name} -setup {
+    proc tcl_says_hi_from_js { a } {
+	return "Hi $a!"
+    }
+    set jsip [js::interp]
+} -body {
+    $jsip function tcl_says_hi_from_js 1 string
+    $jsip eval {tcl_says_hi_from_js("World");}
+} -cleanup {
+    $jsip destroy
+    rename tcl_says_hi_from_js {}
+} -returnCodes {ok return} -result {Hi World!}
+
+test tcljs-6.4 {register function with invalid number of arguments} -setup {
+    set jsip [js::interp]
+} -body {
+    $jsip function
+} -cleanup {
+    $jsip destroy
+} -returnCodes {error} -match glob -result {wrong # args: should be "::js::jsip* function tclName nrArgs returnType \?javascriptName\?"}
+
+test tcljs-6.5 {register function with invalid number of arguments} -setup {
+    set jsip [js::interp]
+} -body {
+    $jsip function a b c d e f g h i j k l m n o p
+} -cleanup {
+    $jsip destroy
+} -returnCodes {error} -match glob -result {wrong # args: should be "::js::jsip* function tclName nrArgs returnType \?javascriptName\?"}
+
+test tcljs-6.6 {register function with invalid argument} -setup {
+    set jsip [js::interp]
+} -body {
+    $jsip function test qwerty string
+} -cleanup {
+    $jsip destroy
+} -returnCodes {error} -match glob -result {expected integer but got "qwerty"}
+
+test tcljs-6.7 {register function with invalid argument} -setup {
+    set jsip [js::interp]
+} -body {
+    $jsip function test 1 qwerty
+} -cleanup {
+    $jsip destroy
+} -returnCodes {error} -match glob -result {bad returnType "qwerty": must be boolean, double, int, or string}
+
+test tcljs-6.8 {register function again} -setup {
+    set jsip [js::interp]
+    proc tcl_says_hi_from_js { a } {
+	return "Hi $a!"
+    }
+} -body {
+    $jsip function tcl_says_hi_from_js 1 string tcl_says_hi
+    $jsip function tcl_says_hi_from_js 1 string tcl_says_hi
+    $jsip eval {tcl_says_hi("World");}
+} -cleanup {
+    $jsip destroy
+} -returnCodes {ok return} -result {Hi World!}
+
+test tcljs-6.9 {register function again} -setup {
+    set jsip [js::interp]
+    proc tcl_says_hi_from_js { a } {
+	return "Hi $a!"
+    }
+} -body {
+    $jsip function tcl_says_hi_from_js 1 string
+    $jsip function tcl_says_hi_from_js 1 string
+    $jsip eval {tcl_says_hi_from_js("World");}
+} -cleanup {
+    $jsip destroy
+} -returnCodes {ok return} -result {Hi World!}
+
+test tcljs-6.10 {register function twice with different Js names} -setup {
+    set jsip [js::interp]
+    proc tcl_says_hi_from_js { a } {
+	return "Hi $a!"
+    }
+} -body {
+    $jsip function tcl_says_hi_from_js 1 string f1
+    $jsip function tcl_says_hi_from_js 1 string f2
+    lappend result [$jsip eval {f1("World");}]
+    lappend result [$jsip eval {f2("Planet");}]
+} -cleanup {
+    $jsip destroy
+    unset -nocomplain result
+} -returnCodes {ok return} -result {{Hi World!} {Hi Planet!}}
+
+test tcljs-6.11 {register function with existing Js name} -setup {
+    set jsip [js::interp]
+    proc say_hi { a } {
+	return "Hi $a from Tcl!"
+    }
+    $jsip eval {function say_hi(a) { return "Hi " + a + " from Js"; }}
+} -body {
+    lappend result [$jsip eval {say_hi("World");}]
+    $jsip function say_hi 1 string says_hi
+    lappend result [$jsip eval {says_hi("World");}]
+} -cleanup {
+    $jsip destroy
+    unset -nocomplain result
+} -returnCodes {ok} -result {{Hi World from Js} {Hi World from Tcl!}}
+
+test tcljs-6.12 {register function in multiple Js interps} -setup {
+    set jsip1 [js::interp]
+    set jsip2 [js::interp]
+    proc say_hi { a } {
+	return "Hi $a from Tcl!"
+    }
+} -body {
+    $jsip1 function say_hi 1 string say_hi
+    $jsip2 function say_hi 1 string say_hi
+    lappend result [$jsip1 eval {say_hi("ip1")}]
+    lappend result [$jsip2 eval {say_hi("ip2")}]
+} -cleanup {
+    $jsip1 destroy
+    $jsip2 destroy
+    unset -nocomplain result
+} -returnCodes {ok} -result {{Hi ip1 from Tcl!} {Hi ip2 from Tcl!}}
+
+test tcljs-6.13 {register function in multiple Js interps} -setup {
+    set jsip1 [js::interp]
+    set jsip2 [js::interp]
+    proc say_hi { a } {
+	return "Hi $a from Tcl!"
+    }
+} -body {
+    $jsip1 function say_hi 1 string say_hi
+    $jsip2 function say_hi 1 string say_hi
+    lappend result [$jsip1 eval {say_hi("ip1")}]
+    lappend result [$jsip2 eval {say_hi("ip2")}]
+    $jsip1 destroy
+    lappend result [$jsip2 eval {say_hi("ip2")}]
+} -cleanup {
+    $jsip2 destroy
+    unset -nocomplain result
+} -returnCodes {ok} -result {{Hi ip1 from Tcl!} {Hi ip2 from Tcl!} {Hi ip2 from Tcl!}}
+
+test tcljs-6.14 {register multiple functions in Js interp} -setup {
+    set jsip1 [js::interp]
+    proc high { a } {
+	return "High $a!"
+    }
+    proc low { a } {
+	return "Low $a!"
+    }
+} -body {
+    $jsip1 function high 1 string
+    $jsip1 function low 1 string
+    lappend result [$jsip1 eval {high(5)}]
+    lappend result [$jsip1 eval {low(5)}]
+} -cleanup {
+    $jsip1 destroy
+    unset -nocomplain result
+} -returnCodes {ok} -result {{High 5!} {Low 5!}}
+
+# 7. <jsip> callback tests
+
+test tcljs-7.1 {callback Js-interp} -setup {
+    set result {}
+    proc jscb { } {
+	lappend ::result jscb[incr ::i]
+    }
+    set jsip [js::interp]
+    $jsip eval {function a(pa, pb) {
+	var x = pa+pb;
+	var y = pa*pb;
+	if (x>y)
+            return x;
+	return y;
+    }
+    }
+} -body {
+    $jsip callback jscb
+    for {set i 0 } { $i < 10 } { incr i } { 
+	for {set j 9} { $j >= 0 } { incr j -1 } {
+	    lappend result "$i $j [$jsip eval a($i,$j)]"
+	}
+    }
+    set result
+} -cleanup {
+    $jsip destroy
+} -returnCodes {ok return} -result {jscb1 {0 9 9} jscb2 {1 8 9} jscb3 {2 7 14} jscb4 {3 6 18} jscb5 {4 5 20} jscb6 {5 4 20} jscb7 {6 3 18} jscb8 {7 2 14} jscb9 {8 1 9} jscb10 {9 0 9}}
+
+test tcljs-7.2 {callback Js-interp with wrong number of arguments} -setup {
+    set jsip [js::interp]
+} -body {
+    $jsip callback
+} -cleanup {
+} -returnCodes {error} -match glob -result {wrong # args: should be "::js::jsip* callback script"}
+
+test tcljs-7.3 {callback Js-interp with error in callback} -setup {
+    set result {}
+    proc jscb { } {
+	qwerty
+    }
+    set jsip [js::interp]
+    $jsip eval {function a(pa, pb) {
+	var x = pa+pb;
+	var y = pa*pb;
+	if (x>y)
+            return x;
+	return y;
+    }
+    }
+} -body {
+    $jsip callback jscb
+    $jsip eval a($i,$j)
+} -cleanup {
+    $jsip destroy
+} -returnCodes {error} -match glob -result {*invalid command name "qwerty"*}
+
+# cleanup
+::tcltest::cleanupTests
+return
