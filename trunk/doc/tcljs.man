@@ -1,0 +1,53 @@
+[comment {-*- tcl -*- doctools manpage}]
+[manpage_begin TclJs n 0.1]
+[copyright {2006-2009 Jos Decoster <jos.decoster@gmail.com>}]
+[moddesc {Tcl extension to execute JavaScript using SpiderMonkey}]
+[titledesc {Tcl extension to execute JavaScript using SpiderMonkey}]
+[require Tcl 8.4]
+[description]
+
+[para] This page describes the Tcl [package TclJs] package. It will allow for
+the execution of JavaScript using SpiderMonkey from Tcl. The [package TclJs]
+package adds the namespace [strong js] to the Tcl interpreter in which it is
+loaded.
+
+[section COMMANDS]
+
+[list_begin definitions]
+
+[call [cmd ::js::interp]]
+
+Create a new JavaScript interpreter. The command will return a handle to the
+newly generated interpreter. This handle can be used interact with the
+JavaScript interpreter.
+
+[call [arg jsInterp] [method eval] [arg script]]
+
+Evaluate the specified script in the JavaScript interpreter. The result of the
+evaluated script is returned.
+
+[call [arg jsInterp] [method uceval] [arg script]]
+
+Evaluate the specified UniCode script in the JavaScript interpreter. The result
+of the evaluated script is returned.
+
+[call [arg jsInterp] [method function] [arg tclCommand] [arg numberOfArguments] [arg returnType] [opt [arg jsCommand]]]
+
+Add the specified Tcl command [arg tclCommand] as a function with 
+[arg numberOfArguments] arguments and return type [arg returnType] to the
+JavaScript interpreter. If [arg jsCommand] is specified, use this as the
+function name, otherwise use [arg tclCommand]. Valid [arg returnType] values are
+[strong boolean], [strong double], [strong int] and [strong string].
+
+[call [arg jsInterp] [method destroy]]
+
+Destroy the JavaScript interpreter
+
+[call [arg jsInterp] [method callback] [arg script]]
+
+Register [arg script] to be called when the JavaScript interpreter executes its
+branch callback.
+
+[list_end]
+[keywords JavaScript SpiderMonkey]
+[manpage_end]
