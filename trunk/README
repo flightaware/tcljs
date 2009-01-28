@@ -80,8 +80,9 @@ then run make. You will need to specify 3 configure parameters:
 
             -DXP_UNIX
 
-The following minimal example will install the extension in the
-/opt/tcl directory when SpiderMonkey was build in /tmp/js for Linux:
+The following minimal example will configure, compile, test and install the
+extension in the /opt/tcl directory when SpiderMonkey was build in /tmp/js for
+Linux:
 
 	$ cd sampleextension
 	$ ./configure --prefix=/opt/tcl \
@@ -89,11 +90,8 @@ The following minimal example will install the extension in the
 	    --with-spidermonkey-build-type=Linux_All_DBG.OBJ \
 	    --with-spidermonkey-flags=-DXP_UNIX
 	$ make
+	$ make test
 	$ make install
-
-And on windows:
-
-
 
 WINDOWS BUILD
 =============
@@ -110,15 +108,20 @@ this command in the 'Release' directory:
 
  > mt -manifest js32.dll.manifest -outputresource:js32.dll;2
 
-Building the extension with the following commands (int the win directory):
+Building, test and install the extension with the following commands (int the
+win directory):
 
  > nmake -f makefile.vc TCLDIR=c:\Tcl SPIDERMONKEYDIR=c:\tmp\js \
        SPIDERMONKEYTYPE=Release SPIDERMONKEYFLAGS=/DXP_WIN clean
  > nmake -f makefile.vc TCLDIR=c:\Tcl SPIDERMONKEYDIR=c:\tmp\js \
        SPIDERMONKEYTYPE=Release SPIDERMONKEYFLAGS=/DXP_WIN
+ > nmake -f makefile.vc TCLDIR=c:\Tcl SPIDERMONKEYDIR=c:\tmp\js \
+       SPIDERMONKEYTYPE=Release SPIDERMONKEYFLAGS=/DXP_WIN test
+ > nmake -f makefile.vc TCLDIR=c:\Tcl SPIDERMONKEYDIR=c:\tmp\js \
+       SPIDERMONKEYTYPE=Release SPIDERMONKEYFLAGS=/DXP_WIN install
 
-After install, copy the js32.dll and required MSRT* files into the lib directory
-where TclJs01.dll is located.
+After install, copy the js32.dll and required MSVCR* files into the lib
+directory where TclJs01.dll is located.
 
 INSTALLATION
 ============
