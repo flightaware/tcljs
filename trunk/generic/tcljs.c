@@ -245,7 +245,7 @@ tclJsInterpCmd(
     const char *jsFuncName;
     const char *script;
     const char *tclFuncName;
-    int index, len, cnt, new, typeIndex;
+    int index, len, new, typeIndex;
     jsval rval;
     struct TclJsPrivateContextData *private = (struct TclJsPrivateContextData *)
 	JS_GetContextPrivate(jsClass->cx);
@@ -318,23 +318,21 @@ tclJsInterpCmd(
 	Tcl_DeleteCommand(interp, script);
 	break;
     case TCLJS_FUNCTION:
-	if (objc < 5 || objc > 6) {
+	if (objc < 4 || objc > 5) {
 	    Tcl_WrongNumArgs(interp, 2, objv,
-			     "tclName nrArgs returnType "
+			     "tclName returnType "
 			     "?javascriptName?");
 	    return TCL_ERROR;
 	}
 	private->error = 0;	
 	/* get function name in tcl and in JS */
 	tclFuncName = Tcl_GetStringFromObj(objv[2], NULL);
-	if (Tcl_GetIntFromObj(interp, objv[3], &cnt) != TCL_OK)
-	    return TCL_ERROR;
-	if (objc == 6)
-	    jsFuncName = Tcl_GetStringFromObj(objv[5], NULL);
+	if (objc == 5)
+	    jsFuncName = Tcl_GetStringFromObj(objv[4], NULL);
 	else
 	    jsFuncName = tclFuncName;
 	/* get return type */
-	if (Tcl_GetIndexFromObj(interp, objv[4], jsReturnTypes, "returnType",
+	if (Tcl_GetIndexFromObj(interp, objv[3], jsReturnTypes, "returnType",
 				0, &typeIndex) != TCL_OK)
 	    return TCL_ERROR;
 	/* check if function with same JS name already exists */
