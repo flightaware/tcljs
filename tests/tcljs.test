@@ -14,7 +14,7 @@ if {[lsearch [namespace children] ::tcltest] == -1} {
     package require tcltest
     namespace import ::tcltest::*
 }
-
+lappend auto_path ..
 package require TclJs
 
 # 1. js::interp tests
@@ -123,7 +123,7 @@ test tcljs-5.2 {destroy Js-interp with arguments} -setup {
 test tcljs-6.1 {call tcl command from Js-interp} -setup {
     set jsip [js::interp]
 } -body {
-    $jsip function set 2 string tcl_set
+    $jsip function set string tcl_set
     $jsip eval {tcl_set("qwerty", "azerty");}
     set qwerty
 } -cleanup {
@@ -136,7 +136,7 @@ test tcljs-6.2 {call tcl function from Js-interp} -setup {
     }
     set jsip [js::interp]
 } -body {
-    $jsip function tcl_says_hi_from_js 1 string tcl_says_hi
+    $jsip function tcl_says_hi_from_js string tcl_says_hi
     $jsip eval {tcl_says_hi("World");}
 } -cleanup {
     $jsip destroy
@@ -149,7 +149,7 @@ test tcljs-6.3 {call tcl function from Js-interp, default function name} -setup 
     }
     set jsip [js::interp]
 } -body {
-    $jsip function tcl_says_hi_from_js 1 string
+    $jsip function tcl_says_hi_from_js string
     $jsip eval {tcl_says_hi_from_js("World");}
 } -cleanup {
     $jsip destroy
@@ -162,7 +162,7 @@ test tcljs-6.4 {register function with invalid number of arguments} -setup {
     $jsip function
 } -cleanup {
     $jsip destroy
-} -returnCodes {error} -match glob -result {wrong # args: should be "::js::jsip* function tclName nrArgs returnType \?javascriptName\?"}
+} -returnCodes {error} -match glob -result {wrong # args: should be "::js::jsip* function tclName returnType \?javascriptName\?"}
 
 test tcljs-6.5 {register function with invalid number of arguments} -setup {
     set jsip [js::interp]
@@ -170,20 +170,12 @@ test tcljs-6.5 {register function with invalid number of arguments} -setup {
     $jsip function a b c d e f g h i j k l m n o p
 } -cleanup {
     $jsip destroy
-} -returnCodes {error} -match glob -result {wrong # args: should be "::js::jsip* function tclName nrArgs returnType \?javascriptName\?"}
-
-test tcljs-6.6 {register function with invalid argument} -setup {
-    set jsip [js::interp]
-} -body {
-    $jsip function test qwerty string
-} -cleanup {
-    $jsip destroy
-} -returnCodes {error} -match glob -result {expected integer but got "qwerty"}
+} -returnCodes {error} -match glob -result {wrong # args: should be "::js::jsip* function tclName returnType \?javascriptName\?"}
 
 test tcljs-6.7 {register function with invalid argument} -setup {
     set jsip [js::interp]
 } -body {
-    $jsip function test 1 qwerty
+    $jsip function test qwerty
 } -cleanup {
     $jsip destroy
 } -returnCodes {error} -match glob -result {bad returnType "qwerty": must be boolean, double, int, or string}
@@ -194,8 +186,8 @@ test tcljs-6.8 {register function again} -setup {
 	return "Hi $a!"
     }
 } -body {
-    $jsip function tcl_says_hi_from_js 1 string tcl_says_hi
-    $jsip function tcl_says_hi_from_js 1 string tcl_says_hi
+    $jsip function tcl_says_hi_from_js string tcl_says_hi
+    $jsip function tcl_says_hi_from_js string tcl_says_hi
     $jsip eval {tcl_says_hi("World");}
 } -cleanup {
     $jsip destroy
@@ -207,8 +199,8 @@ test tcljs-6.9 {register function again} -setup {
 	return "Hi $a!"
     }
 } -body {
-    $jsip function tcl_says_hi_from_js 1 string
-    $jsip function tcl_says_hi_from_js 1 string
+    $jsip function tcl_says_hi_from_js string
+    $jsip function tcl_says_hi_from_js string
     $jsip eval {tcl_says_hi_from_js("World");}
 } -cleanup {
     $jsip destroy
@@ -220,8 +212,8 @@ test tcljs-6.10 {register function twice with different Js names} -setup {
 	return "Hi $a!"
     }
 } -body {
-    $jsip function tcl_says_hi_from_js 1 string f1
-    $jsip function tcl_says_hi_from_js 1 string f2
+    $jsip function tcl_says_hi_from_js string f1
+    $jsip function tcl_says_hi_from_js string f2
     lappend result [$jsip eval {f1("World");}]
     lappend result [$jsip eval {f2("Planet");}]
 } -cleanup {
@@ -237,7 +229,7 @@ test tcljs-6.11 {register function with existing Js name} -setup {
     $jsip eval {function say_hi(a) { return "Hi " + a + " from Js"; }}
 } -body {
     lappend result [$jsip eval {say_hi("World");}]
-    $jsip function say_hi 1 string says_hi
+    $jsip function say_hi string says_hi
     lappend result [$jsip eval {says_hi("World");}]
 } -cleanup {
     $jsip destroy
@@ -251,8 +243,8 @@ test tcljs-6.12 {register function in multiple Js interps} -setup {
 	return "Hi $a from Tcl!"
     }
 } -body {
-    $jsip1 function say_hi 1 string say_hi
-    $jsip2 function say_hi 1 string say_hi
+    $jsip1 function say_hi string say_hi
+    $jsip2 function say_hi string say_hi
     lappend result [$jsip1 eval {say_hi("ip1")}]
     lappend result [$jsip2 eval {say_hi("ip2")}]
 } -cleanup {
@@ -268,8 +260,8 @@ test tcljs-6.13 {register function in multiple Js interps} -setup {
 	return "Hi $a from Tcl!"
     }
 } -body {
-    $jsip1 function say_hi 1 string say_hi
-    $jsip2 function say_hi 1 string say_hi
+    $jsip1 function say_hi string say_hi
+    $jsip2 function say_hi string say_hi
     lappend result [$jsip1 eval {say_hi("ip1")}]
     lappend result [$jsip2 eval {say_hi("ip2")}]
     $jsip1 destroy
@@ -288,8 +280,8 @@ test tcljs-6.14 {register multiple functions in Js interp} -setup {
 	return "Low $a!"
     }
 } -body {
-    $jsip1 function high 1 string
-    $jsip1 function low 1 string
+    $jsip1 function high string
+    $jsip1 function low string
     lappend result [$jsip1 eval {high(5)}]
     lappend result [$jsip1 eval {low(5)}]
 } -cleanup {
