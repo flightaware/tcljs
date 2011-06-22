@@ -27,7 +27,7 @@ AC_INIT([TclJs], [0.1])
 # as well as PKG_LIB_FILE and PKG_STUB_LIB_FILE.
 #--------------------------------------------------------------------
 
-TEA_INIT([3.7])
+TEA_INIT([3.9])
 
 AC_CONFIG_AUX_DIR(tclconfig)
 
@@ -60,6 +60,7 @@ TEA_PREFIX
 #-----------------------------------------------------------------------
 
 TEA_SETUP_COMPILER
+AC_PROG_INSTALL
 
 #-----------------------------------------------------------------------
 # __CHANGE__
@@ -191,12 +192,6 @@ AC_ARG_WITH(spidermonkey,
   [SPIDERMONKEYDIR=$withval
    AC_SUBST(SPIDERMONKEYDIR)],
   [AC_MSG_ERROR(No spidermonkey directory specified)])
-
-AC_ARG_WITH(spidermonkey-build-type,
-  [  --with-spidermonkey-build-type=TYPE],
-  [SPIDERMONKEYBTP=$withval
-   AC_SUBST(SPIDERMONKEYBTP)],
-  [AC_MSG_ERROR(No spidermonkey build-type specified)])
 
 AC_ARG_WITH(spidermonkey-flags,
   [  --with-spidermonkey-flags=TYPE],

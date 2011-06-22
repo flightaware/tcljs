@@ -1,0 +1,15 @@
+2011-06-21 Karl Lehenbauer
+    * Makefile.in, configure.in: spidermonkey's install is well-behaved now,
+    so we can discard some of our little hacks.  We no longer look into
+    spidermonkey's source tree for includes, they're in /usr/local/include.  
+    We no longer need to know the spidermonkey build type.  We can link 
+    libTclJs.so with shared library libjs.so or whatever (TEA standard) 
+    rather than having to use static library libjs.a.
+
+    * generic/tcljs.c: when creating a new javascript interpreter, set the
+    global class flags to JSCLASS_GLOBAL_FLAGS rather than 0, in accordance
+    with the docs.
+
+    * tclconfig/tcl.m4, tclconfig/ChangeLog, tclconfig/install.sh: Upgrade
+    to TEA version 3.9.
+
