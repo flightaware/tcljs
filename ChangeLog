@@ -6,6 +6,9 @@
     libTclJs.so with shared library libjs.so or whatever (TEA standard) 
     rather than having to use static library libjs.a.
 
+    Update dtp.kit doc processor invocation to use dtplite with expected
+    dtplite arguments for directing output.
+
     * generic/tcljs.c: when creating a new javascript interpreter, set the
     global class flags to JSCLASS_GLOBAL_FLAGS rather than 0, in accordance
     with the docs.
@@ -13,3 +16,6 @@
     * tclconfig/tcl.m4, tclconfig/ChangeLog, tclconfig/install.sh: Upgrade
     to TEA version 3.9.
 
+    * doc/tcljs.man: Update docs to reflect that the number of arguments
+    is no longer required when defining a JavaScript function that calls
+    out to a Tcl proc.  Clean up docs a bit.  Update copyrights.
