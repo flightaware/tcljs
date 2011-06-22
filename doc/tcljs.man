@@ -31,6 +31,9 @@ JavaScript interpreter.
 Evaluate the specified JavaScript script in the JavaScript interpreter. 
 The result of the evaluated script is returned.
 
+If the JavaScript does not compile or does not execute successfully, a
+Tcl error is triggered.
+
 [call [arg jsInterp] [method uceval] [arg script]]
 
 Evaluate the specified UniCode script in the JavaScript interpreter. The result
@@ -44,6 +47,9 @@ JavaScript interpreter. If [arg jsCommand] is specified, use this as the
 JavaScript function name, otherwise use [arg tclCommand] as the name. 
 Valid [arg returnType] values are
 [emph boolean], [emph double], [emph int] and [emph string].
+
+If the Tcl code has an uncaught error, tcljs will throw a corresponding
+JavaScript exception.
 
 [call [arg jsInterp] [method destroy]]
 
