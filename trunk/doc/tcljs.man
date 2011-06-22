@@ -1,14 +1,19 @@
 [comment {-*- tcl -*- doctools manpage}]
 [manpage_begin TclJs n 0.1]
-[copyright {2006-2009 Jos Decoster <jos.decoster@gmail.com>}]
+[copyright {2006-2011 Jos Decoster <jos.decoster@gmail.com>}]
+[copyright {2009-2011 Karl Lehenbauer <karllehenbauer@gmail.com>}]
 [moddesc {Tcl extension to execute JavaScript using SpiderMonkey}]
 [titledesc {Tcl extension to execute JavaScript using SpiderMonkey}]
-[require Tcl 8.4]
+[require TclJs 0.1]
 [description]
 
-[para] This page describes the Tcl [package TclJs] package. It will allow for
-the execution of JavaScript using SpiderMonkey from Tcl. The [package TclJs]
-package adds the namespace [strong js] to the Tcl interpreter in which it is
+[para] This page describes the Tcl [package TclJs] package. It provides a
+Tcl interface to create JavaScript interpreters using Spidermonkey, 
+evaluate JavaScript code within them, and extend them by adding new
+JavaScirpt commands that work by invoking Tcl commands and returning their
+results.
+Tcl. The [package TclJs]
+package adds the namespace [emph js] to the Tcl interpreter in which it is
 loaded.
 
 [section COMMANDS]
@@ -23,21 +28,22 @@ JavaScript interpreter.
 
 [call [arg jsInterp] [method eval] [arg script]]
 
-Evaluate the specified script in the JavaScript interpreter. The result of the
-evaluated script is returned.
+Evaluate the specified JavaScript script in the JavaScript interpreter. 
+The result of the evaluated script is returned.
 
 [call [arg jsInterp] [method uceval] [arg script]]
 
 Evaluate the specified UniCode script in the JavaScript interpreter. The result
 of the evaluated script is returned.
 
-[call [arg jsInterp] [method function] [arg tclCommand] [arg numberOfArguments] [arg returnType] [opt [arg jsCommand]]]
+[call [arg jsInterp] [method function] [arg tclCommand] [arg returnType] [opt [arg jsCommand]]]
 
-Add the specified Tcl command [arg tclCommand] as a function with 
-[arg numberOfArguments] arguments and return type [arg returnType] to the
+Add the specified Tcl command [arg tclCommand] as a function callable from
+Javascript that returns an element of type [arg returnType] to the
 JavaScript interpreter. If [arg jsCommand] is specified, use this as the
-function name, otherwise use [arg tclCommand]. Valid [arg returnType] values are
-[strong boolean], [strong double], [strong int] and [strong string].
+JavaScript function name, otherwise use [arg tclCommand] as the name. 
+Valid [arg returnType] values are
+[emph boolean], [emph double], [emph int] and [emph string].
 
 [call [arg jsInterp] [method destroy]]
 

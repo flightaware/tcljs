@@ -200,8 +200,8 @@ libraries:
 #========================================================================
 
 doc:
-	dtp.kit doc html doc/tcljs.man > doc/tcljs.html
-	dtp.kit doc nroff doc/tcljs.man > doc/tcljs.n
+	dtplite -o doc/tcljs.html html doc/tcljs.man
+	dtplite -o doc/tcljs.n nroff doc/tcljs.man
 
 install: all install-binaries install-libraries install-doc
 
