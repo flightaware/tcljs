@@ -1,4 +1,4 @@
 
 
-./configure --with-tcl=/usr/local/lib/tcl8.5 --with-spidermonkey=/usr/local --with-spidermonkey-flags="-DXP_UNIX -DFREEBSD"
+./configure --with-tcl=/usr/local/lib/tcl8.5 --with-spidermonkey=/usr/local --with-spidermonkey-flags="-DXP_UNIX -DFREEBSD" --mandir=/usr/local/man
 
