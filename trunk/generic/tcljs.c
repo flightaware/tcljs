@@ -529,7 +529,7 @@ tclJsInterp(
     jsClass->cx = NULL;
     jsClass->glob = NULL;
     jsClass->global_class.name = "global";
-    jsClass->global_class.flags = 0;
+    jsClass->global_class.flags = JSCLASS_GLOBAL_FLAGS;
     jsClass->global_class.addProperty = JS_PropertyStub;
     jsClass->global_class.delProperty = JS_PropertyStub;
     jsClass->global_class.getProperty = JS_PropertyStub;
