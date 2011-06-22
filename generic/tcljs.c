@@ -568,8 +568,14 @@ tclJsInterp(
 
     /* js initialisations */
     JS_SetOptions (jsClass->cx, JSOPTION_VAROBJFIX);
-    // NB - doc'ed this way but doesn' work JS_SetVersion(cx, JSVERSION_LATEST);
+
+// NB - JSVERSION_LATEST is documented but not defined in spidermonkey source
+// as of 1.7
+#ifdef JSVERSION_LATEST
+    JS_SetVersion(cx, JSVERSION_LATEST);
+#else
     JS_SetVersion(jsClass->cx, JSVERSION_1_7);
+#endif
 
     /* set error callback */
     JS_SetErrorReporter (jsClass->cx, tclJsErrorHandler);
